@@ -209,8 +209,7 @@
       });
       ws.columns=[{width:12},{width:15},{width:30},{width:20},{width:15},{width:14},{width:12},{width:14},{width:2},{width:46}];
       // Header band with logo
-      ws.mergeCells('A1:C2');
-      for(let r=1;r<=2;r++)for(let c=1;c<=3;c++)ws.getCell(r,c).fill=solid(THEME.white);
+      for(let r=1;r<=2;r++)for(let c=1;c<=3;c++){const lc=ws.getCell(r,c);lc.value=null;lc.fill=solid(THEME.white);}
       ws.mergeCells('D1:J1');ws.getCell('D1').value='BACOLOD WAREHOUSE';
       ws.mergeCells('D2:J2');ws.getCell('D2').value='PETTY CASH LIQUIDATION';
       ws.getRow(1).height=32;ws.getRow(2).height=28;
@@ -241,7 +240,7 @@
         cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};setCellBorder(cell,'2F7347');
       }
       // Data rows
-      const count=Math.max(18,state.entries.length);const first=7;const last=first+count-1;const totalRow=last+1;
+      const count=Math.max(13,state.entries.length);const first=7;const last=first+count-1;const totalRow=last+1;
       state.entries.forEach((entry,i)=>{
         const row=ws.getRow(first+i);row.height=29;
         const fields=[dateForExcel(entry.date),compact(entry.payee).toUpperCase()||null,compact(entry.company).toUpperCase()||null,compact(entry.tin)||null,compact(entry.receipt)||null,number(entry.amount),number(entry.vat),number(entry.net),null,compact(entry.particulars).toUpperCase()||null];
