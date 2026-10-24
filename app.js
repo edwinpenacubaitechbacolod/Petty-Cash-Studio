@@ -237,17 +237,17 @@
       // 13 transaction rows by default, starting directly below the row 5–6 headers.
       const count=Math.max(13,state.entries.length);const first=7;const last=first+count-1;const totalRow=last+1;
       state.entries.forEach((entry,i)=>{
-        const row=ws.getRow(first+i);row.height=23;
+        const row=ws.getRow(first+i);row.height=22;
         const fields=[dateForExcel(entry.date),compact(entry.payee).toUpperCase()||null,compact(entry.company).toUpperCase()||null,compact(entry.tin)||null,compact(entry.receipt)||null,number(entry.amount),number(entry.vat),number(entry.net),null,compact(entry.particulars).toUpperCase()||null];
         fields.forEach((v,j)=>{if(v!==null && v!==undefined)row.getCell(j+1).value=v;});
         row.getCell(1).numFmt='mm/dd/yyyy';
         for(const col of [6,7,8])row.getCell(col).numFmt='#,##0.00;[Red](#,##0.00);-';
       });
       for(let r=first;r<=last;r++){
-        const row=ws.getRow(r);if(!row.height)row.height=23;
+        const row=ws.getRow(r);row.height=22;
         for(let c=1;c<=10;c++){
           const cell=row.getCell(c);cell.font={name:'Arial',size:9,color:{argb:'FF1F2D26'}};
-          cell.alignment={vertical:'middle',horizontal:[6,7,8].includes(c)?'right':c===10?'left':'center',wrapText:true,indent:c===10?1:0,shrinkToFit:[6,7,8].includes(c)};
+          cell.alignment={vertical:'middle',horizontal:[6,7,8].includes(c)?'right':c===10?'left':'center',wrapText:false,indent:0,shrinkToFit:true};
           if(c!==9){const line={style:'hair',color:{argb:'FFE2EAE4'}};cell.border={top:line,bottom:line,left:line,right:line};}
           if(r%2===0&&c!==9)cell.fill=solid(THEME.band);
         }
