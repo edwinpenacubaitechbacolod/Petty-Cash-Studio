@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c2832">
+  <meta name="description" content="Bacolod Warehouse petty cash liquidation — scan supporting documents, review entries, and export a two-tab Excel report.">
+  <title>Bacolod Warehouse | Petty Cash Studio</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-icon">BW<span class="brand-dot"></span></span><span><strong>BACOLOD</strong><small>WAREHOUSE / FINANCE</small></span></div>
+      <div class="side-label">WORKSPACE</div>
+      <nav class="steps" aria-label="Workspace sections">
+        <a href="#details" class="active"><span>01</span> Report details</a>
+        <a href="#documents"><span>02</span> Documents</a>
+        <a href="#entries"><span>03</span> Review entries</a>
+        <a href="#export"><span>04</span> Export report</a>
+      </nav>
+      <div class="sidebar-bottom"><span class="online-dot"></span> Browser-based workspace <small>Your receipts are processed on your device. Nothing is uploaded to a server by this app.</small></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> Finance <span>/</span> Petty Cash</div><span class="top-badge">Internal reporting tool</span></header>
+      <section class="hero">
+        <div class="eyebrow"><span class="eyebrow-line"></span> BACOLOD WAREHOUSE OPERATIONS</div>
+        <div class="hero-main"><div><h1>Petty Cash <em>Studio.</em></h1><p>From supporting documents to liquidation report. Upload, verify, and export your Excel file in one workspace.</p></div><div class="hero-mark" aria-hidden="true"><svg viewBox="0 0 140 140"><rect x="26" y="13" width="88" height="114" rx="12" fill="none" stroke="currentColor" stroke-width="3"/><path d="M43 42h52M43 59h52M43 76h33M43 99l12 12 27-29" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div></div>
+      </section>
+
+      <div class="stat-grid">
+        <div class="stat"><span>DOCUMENTS ADDED</span><div><strong id="documentCount">0</strong><i>uploaded files / pages</i></div></div>
+        <div class="stat"><span>LIQUIDATION ENTRIES</span><div><strong id="entryCount">0</strong><i>editable transactions</i></div></div>
+        <div class="stat accent"><span>RECORDED EXPENSES</span><div><strong id="totalAmount">₱0.00</strong><i>from entered amounts</i></div></div>
+      </div>
+
+      <section id="details" class="panel">
+        <div class="section-heading"><div><div class="number-label">01 / REPORT SETUP</div><h2>Liquidation details</h2><p>These details appear at the top of your Excel report.</p></div><span class="tag">Based on REF# 26-72 layout</span></div>
+        <div class="fields-grid">
+          <label>Reference number<input id="reference" value="26-73" placeholder="e.g. 26-73" autocomplete="off"></label>
+          <label>Period from<input id="periodFrom" type="date"></label>
+          <label>Period to<input id="periodTo" type="date"></label>
+          <label>Prepared by<input id="preparedBy" value="EDWIN PENACUBA" autocomplete="off"></label>
+          <label>Default payee (optional)<input id="defaultPayee" placeholder="Applied to newly added receipts"></label>
+          <label>Approver names (optional)<input id="approvers" placeholder="Separate names with a comma"></label>
+        </div>
+      </section>
+
+      <section id="documents" class="panel">
+        <div class="section-heading"><div><div class="number-label">02 / COLLECT & SCAN</div><h2>Supporting documents</h2><p>Upload scanned vouchers, invoices, receipts, or PDF documents.</p></div><span class="tag">PNG · JPG · WEBP · PDF</span></div>
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Choose documents to upload">
+          <div class="upload-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 16V4m0 0L7 9m5-5 5 5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg></div>
+          <strong>Drop your supporting files here</strong><p>or <u>browse your computer</u> to select multiple documents</p><small>Receipts are scanned locally using OCR. Handwritten fields may need correction.</small>
+          <input id="fileInput" type="file" multiple accept=".pdf,image/png,image/jpeg,image/webp" hidden>
+        </div>
+        <div class="document-toolbar"><div id="scanMessage" class="subtle">No documents added yet.</div><div><button id="addManual" class="button secondary" type="button">+ Add manual entry</button><button id="clearDocs" class="button text-button" type="button">Clear documents</button></div></div>
+        <div class="documents" id="documentList"></div>
+        <div class="notice"><span class="notice-icon">i</span><p><strong>Combined scans are supported.</strong> If one image contains several receipts, use <strong>Crop receipt</strong> to scan each part separately. All original uploads remain available for the Attachments tab.</p></div>
+      </section>
+
+      <section id="entries" class="panel">
+        <div class="section-heading"><div><div class="number-label">03 / VERIFY & CORRECT</div><h2>Liquidation entries</h2><p>Review extracted values. Leave any unavailable field blank.</p></div><span class="tag" id="reviewCount">0 entries to review</span></div>
+        <div class="review-help"><span>✓</span> We never automatically invent TINs, OR/SI numbers, payees, VAT, or missing amounts. VAT fields only populate when they appear on the document.</div>
+        <div class="table-scroller"><table class="entry-table"><thead><tr><th>#</th><th>Date</th><th>Payee</th><th>Company name</th><th>TIN</th><th>OR / SI no.</th><th>Total (₱)</th><th>12% VAT (₱)</th><th>Without VAT (₱)</th><th>Particulars</th><th>Action</th></tr></thead><tbody id="entryRows"><tr><td colspan="11" class="empty-table">No transactions yet. Upload a document or add an entry manually.</td></tr></tbody></table></div>
+        <div class="entry-footer"><button id="addEntry" class="button secondary" type="button">+ Add another entry</button><div>Total amount <strong id="tableTotal">₱0.00</strong></div></div>
+      </section>
+
+      <section id="export" class="panel export-panel">
+        <div class="section-heading"><div><div class="number-label">04 / GENERATE REPORT</div><h2>Your finished Excel report</h2><p>One workbook, two tabs—liquidation data and supporting documents.</p></div><span class="ready-indicator"><span></span> Ready when you are</span></div>
+        <div class="export-grid"><div class="export-description"><div class="workbook-icon">X</div><div><strong>Petty Cash Liquidation.xlsx</strong><p><span>Tab 1</span> Liquidation details, totals & prepared-by line<br><span>Tab 2</span> Uploaded receipts, invoices & vouchers</p></div></div><button id="downloadXlsx" class="button primary" type="button">Generate Excel <span>↗</span></button></div>
+        <div class="export-bottom"><p>Export includes only the values you reviewed. Missing data stays blank. Digital approval signatures are not copied from your old report.</p><div><button id="saveDraft" class="button text-button" type="button">↓ Save draft</button><button id="loadDraft" class="button text-button" type="button">↑ Load draft</button><input id="draftInput" type="file" accept=".json" hidden></div></div>
+      </section>
+      <footer>© 2026 Bacolod Warehouse · Petty Cash Studio <span>Prepared for warehouse liquidation reporting</span></footer>
+    </main>
+  </div>
+
+  <div class="modal" id="cropModal" role="dialog" aria-modal="true" aria-labelledby="cropTitle" hidden>
+    <div class="modal-card"><div class="modal-head"><div><div class="number-label">DOCUMENT SELECTION</div><h2 id="cropTitle">Crop an individual receipt</h2></div><button id="closeCrop" class="close-modal" aria-label="Close crop editor">×</button></div><p>Drag a rectangle around one receipt. The selected area becomes a new entry; your original upload remains in Attachments.</p><div class="crop-wrap"><canvas id="cropCanvas"></canvas></div><div class="modal-actions"><span id="cropHint">Drag to select a receipt</span><button id="cropAccept" class="button primary" disabled>Scan selected receipt</button></div></div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
