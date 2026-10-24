@@ -197,71 +197,71 @@
     try {
       const info=details();const wb=new window.ExcelJS.Workbook();wb.creator='Bacolod Warehouse Petty Cash Studio';wb.created=new Date();wb.calcProperties.fullCalcOnLoad=true;
       const sheetTitle=('REF#'+(info.reference||'NEW')).replace(/[\[\]:*?/\\]/g,'').slice(0,31);
-      const ws=wb.addWorksheet(sheetTitle,{pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:1, margins:{left:0.2,right:0.2,top:0.35,bottom:0.35,header:0.15,footer:0.15},horizontalCentered:true},views:[{state:'frozen',ySplit:6}]});
-      ws.columns=[{width:13},{width:15},{width:29},{width:22},{width:17},{width:15},{width:13},{width:15},{width:2.5},{width:48}];
+      const ws=wb.addWorksheet(sheetTitle,{pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0},views:[{state:'frozen',ySplit:6}]});
+      ws.columns=[{width:15},{width:17},{width:35},{width:22},{width:20},{width:16},{width:14},{width:17},{width:3},{width:75}];
       ws.mergeCells('A1:J1');ws.getCell('A1').value='BACOLOD WAREHOUSE';
       ws.mergeCells('A2:J2');ws.getCell('A2').value='PETTY CASH LIQUIDATION';
-      ws.getRow(1).height=30;ws.getRow(2).height=25;
-      for(const [row,fontSize] of [[1,16],[2,12]]){
-        const cell=ws.getCell(`A${row}`);cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF153D3B'}};
-        cell.font={name:'Aptos',size:fontSize,bold:true,color:{argb:'FFFFFFFF'}};cell.alignment={horizontal:'center',vertical:'middle'};
+      ws.getRow(1).height=25;ws.getRow(2).height=24;
+      for(const [row,fontSize] of [[1,17],[2,13]]){
+        const cell=ws.getCell(`A${row}`);cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFA3D765'}};
+        cell.font={name:'Arial',size:fontSize,bold:true,color:{argb:'FF19312B'}};cell.alignment={horizontal:'center',vertical:'middle'};
       }
-      ws.getCell('D3').value=`REF# : ${info.reference}`;ws.getCell('D3').font={name:'Aptos',size:10,bold:true,color:{argb:'FF153D3B'}};
-      ws.mergeCells('E3:H3');ws.getCell('E3').value=reportPeriod(info);ws.getCell('E3').font={name:'Aptos',size:10,bold:true,color:{argb:'FF153D3B'}};
+      ws.getCell('D3').value=`REF# : ${info.reference}`;ws.getCell('D3').font={name:'Arial',size:10,bold:true};
+      ws.mergeCells('E3:H3');ws.getCell('E3').value=reportPeriod(info);ws.getCell('E3').font={name:'Arial',size:10,bold:true};
       ws.getRow(3).height=20;
-      ws.mergeCells('A4:J4');ws.getCell('A4').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFB9D8CA'}};ws.getRow(4).height=7;
+      ws.mergeCells('A4:J4');ws.getCell('A4').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF8E33A'}};ws.getRow(4).height=7;
       [['A','DATE'],['B','PAYEE'],['C','COMPANY NAME'],['D','TIN'],['E','OR.#/S.I.#'],['I',''],['J','PARTICULARS']].forEach(([col,label])=>{if(label){ws.mergeCells(`${col}5:${col}6`);ws.getCell(`${col}5`).value=label;}});
       ws.getCell('F5').value='TOTAL';ws.getCell('F6').value='AMOUNT';ws.getCell('G5').value='12%';ws.getCell('G6').value='VAT';ws.getCell('H5').value='AMOUNT';ws.getCell('H6').value='W/O VAT';
       ws.getRow(5).height=18;ws.getRow(6).height=18;
-      for(let r=5;r<=6;r++)for(let c=1;c<=10;c++){const cell=ws.getCell(r,c);cell.font={name:'Aptos',size:10,bold:true,color:{argb:'FFFFFFFF'}};cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF24635A'}};cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};if(c!==9)setCellBorder(cell,'1C3237');}
+      for(let r=5;r<=6;r++)for(let c=1;c<=10;c++){const cell=ws.getCell(r,c);cell.font={name:'Arial',size:9,bold:true};cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};if(c!==9)setCellBorder(cell,'1C3237');}
       const count=Math.max(18,state.entries.length);const first=7;const last=first+count-1;const totalRow=last+1;
       state.entries.forEach((entry,i)=>{
-        const row=ws.getRow(first+i);row.height=26;
+        const row=ws.getRow(first+i);row.height=29;
         const fields=[dateForExcel(entry.date),compact(entry.payee).toUpperCase()||null,compact(entry.company).toUpperCase()||null,compact(entry.tin)||null,compact(entry.receipt)||null,number(entry.amount),number(entry.vat),number(entry.net),null,compact(entry.particulars).toUpperCase()||null];
         fields.forEach((v,j)=>{if(v!==null && v!==undefined)row.getCell(j+1).value=v;});
         row.getCell(1).numFmt='mm/dd/yyyy';
         for(const col of [6,7,8])row.getCell(col).numFmt='#,##0.00;[Red](#,##0.00);-';
       });
       for(let r=first;r<=last;r++){
-        const row=ws.getRow(r);if(!row.height)row.height=22;
+        const row=ws.getRow(r);if(!row.height)row.height=21;
         for(let c=1;c<=10;c++){
-          const cell=row.getCell(c);cell.font={name:'Aptos',size:10,color:{argb:'FF233C3B'}};cell.alignment={vertical:'middle',horizontal:[6,7,8].includes(c)?'right':c===10?'left':'center',wrapText:true};
-          if(c!==9)setCellBorder(cell,'D9E3DF');
-          if(r%2===0)cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF2F7F5'}};
+          const cell=row.getCell(c);cell.font={name:'Arial',size:9};cell.alignment={vertical:'middle',horizontal:[6,7,8].includes(c)?'right':c===10?'left':'center',wrapText:true};
+          if(c!==9)setCellBorder(cell,'5F6B70');
+          if(r%2===0)cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFF9FCF8'}};
         }
       }
       for(const col of ['F','G','H']){
         const field={F:'amount',G:'vat',H:'net'}[col];
         const cell=ws.getCell(`${col}${totalRow}`);cell.value={formula:`SUM(${col}${first}:${col}${last})`,result:state.entries.reduce((sum,e)=>sum+safeNum(e[field]),0)};
-        cell.numFmt='#,##0.00;[Red](#,##0.00);-';cell.font={name:'Aptos',size:11,bold:true,color:{argb:col==='F'?'FFC52F2F':'FF223939'}};setCellBorder(cell,'1C3237');
+        cell.numFmt='#,##0.00;[Red](#,##0.00);-';cell.font={name:'Arial',size:11,bold:true,color:{argb:col==='F'?'FFC52F2F':'FF223939'}};setCellBorder(cell,'1C3237');
       }
-      ws.getRow(totalRow).height=27;for(let c=1;c<=10;c++){const cell=ws.getRow(totalRow).getCell(c);cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFE0EEE8'}};if(c!==9)setCellBorder(cell,'C2D8D0');}ws.getCell(`C${totalRow}`).value='GRAND TOTAL';ws.getCell(`C${totalRow}`).font={name:'Aptos',size:10,bold:true,color:{argb:'FF153D3B'}};
+      ws.getRow(totalRow).height=23;
       ws.getCell(`C${totalRow+2}`).value=`PREPARED BY: ${info.preparedBy||''}`;
-      ws.getCell(`C${totalRow+2}`).font={name:'Aptos',size:10,bold:true};
+      ws.getCell(`C${totalRow+2}`).font={name:'Arial',size:10,bold:true};
       const approvers=info.approvers.split(',').map(s=>s.trim()).filter(Boolean);
       ws.getCell(`C${totalRow+6}`).value=approvers[0]||null;
       ws.getCell(`D${totalRow+6}`).value=approvers[1]||null;
       ws.getCell(`C${totalRow+7}`).value='SENIOR TEAM LEADER';
       ws.getCell(`D${totalRow+7}`).value='AREA MANAGER';
-      for(const pos of [`C${totalRow+6}`,`D${totalRow+6}`,`C${totalRow+7}`,`D${totalRow+7}`])ws.getCell(pos).font={name:'Aptos',size:9,bold:true};
-      ws.printArea=`A1:J${totalRow+8}`;ws.pageSetup.printTitlesRow='1:6';ws.headerFooter.oddFooter='&L BACOLOD WAREHOUSE  •  PETTY CASH LIQUIDATION &R Page &P of &N';
-      const support=wb.addWorksheet('ATTACHMENTS',{pageSetup:{paperSize:9,orientation:'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0,margins:{left:0.25,right:0.25,top:0.4,bottom:0.4,header:0.15,footer:0.15},horizontalCentered:true}});
+      for(const pos of [`C${totalRow+6}`,`D${totalRow+6}`,`C${totalRow+7}`,`D${totalRow+7}`])ws.getCell(pos).font={name:'Arial',size:9,bold:true};
+      ws.printArea=`A1:J${totalRow+8}`;
+      const support=wb.addWorksheet('ATTACHMENTS',{pageSetup:{paperSize:9,orientation:'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0}});
       for(let i=1;i<=22;i++)support.getColumn(i).width=10;
       support.mergeCells('A1:V2');support.getCell('A1').value=`SUPPORTING DOCUMENTS — REF# ${info.reference}`;
-      support.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF153D3B'}};
-      support.getCell('A1').font={name:'Aptos Display',bold:true,size:16,color:{argb:'FFFFFFFF'}};support.getCell('A1').alignment={vertical:'middle'};
+      support.getCell('A1').fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFA3D765'}};
+      support.getCell('A1').font={name:'Arial',bold:true,size:16};support.getCell('A1').alignment={vertical:'middle'};
       support.getRow(1).height=25;support.getRow(2).height=16;
       const attached=state.documents.filter(d=>d.attachment);let nextRow=5;
-      if(!attached.length){support.getCell('A5').value='NO SUPPORTING DOCUMENTS ATTACHED';support.getCell('A5').font={name:'Aptos',italic:true,color:{argb:'FF71858A'}};}
+      if(!attached.length){support.getCell('A5').value='NO SUPPORTING DOCUMENTS ATTACHED';support.getCell('A5').font={name:'Arial',italic:true,color:{argb:'FF71858A'}};}
       for(let idx=0;idx<attached.length;idx++){
         const doc=attached[idx];
-        support.getCell(`A${nextRow}`).value=`${idx+1}. ${doc.name}`;support.getCell(`A${nextRow}`).font={name:'Aptos',size:10,bold:true};
+        support.getCell(`A${nextRow}`).value=`${idx+1}. ${doc.name}`;support.getCell(`A${nextRow}`).font={name:'Arial',size:10,bold:true};
         const imgId=wb.addImage({base64:doc.dataUrl,extension:'png'});
         const maxWidth=790;const width=Math.min(maxWidth,doc.width);const height=width*doc.height/doc.width;
         support.addImage(imgId,{tl:{col:0,row:nextRow+1},ext:{width,height}});
         nextRow+=Math.ceil(height/20)+5;
       }
-      support.printArea=`A1:V${Math.max(nextRow,8)}`;support.headerFooter.oddFooter='&L SUPPORTING DOCUMENTS &R Page &P of &N';
+      support.printArea=`A1:V${Math.max(nextRow,8)}`;
       const out=await wb.xlsx.writeBuffer();
       const blob=new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
       const href=URL.createObjectURL(blob);const a=document.createElement('a');a.href=href;
