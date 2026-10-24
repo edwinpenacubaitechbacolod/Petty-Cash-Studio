@@ -207,7 +207,7 @@
         headerFooter:{oddFooter:FOOTER},
         views:[{state:'frozen',ySplit:6,showGridLines:false}]
       });
-      ws.columns=[{width:12},{width:15},{width:30},{width:20},{width:15},{width:14},{width:12},{width:14},{width:2},{width:46}];
+      ws.columns=[{width:12},{width:15},{width:30},{width:20},{width:15},{width:19},{width:18},{width:19},{width:2},{width:46}];
       // Header band with logo
       for(let r=1;r<=2;r++)for(let c=1;c<=3;c++){const lc=ws.getCell(r,c);lc.value=null;lc.fill=solid(THEME.white);}
       ws.mergeCells('D1:J1');ws.getCell('D1').value='BACOLOD WAREHOUSE';
@@ -253,8 +253,8 @@
         const row=ws.getRow(r);if(!row.height)row.height=23;
         for(let c=1;c<=10;c++){
           const cell=row.getCell(c);cell.font={name:'Arial',size:9,color:{argb:'FF1F2D26'}};
-          cell.alignment={vertical:'middle',horizontal:[6,7,8].includes(c)?'right':c===10?'left':'center',wrapText:true,indent:[6,7,8].includes(c)||c===10?1:0};
-          if(c!==9)setCellBorder(cell,'B7D3BF');
+          cell.alignment={vertical:'middle',horizontal:[6,7,8].includes(c)?'right':c===10?'left':'center',wrapText:true,indent:c===10?1:0,shrinkToFit:[6,7,8].includes(c)};
+          if(c!==9){const line={style:'hair',color:{argb:'FFE2EAE4'}};cell.border={top:line,bottom:line,left:line,right:line};}
           if(r%2===0&&c!==9)cell.fill=solid(THEME.band);
         }
       }
@@ -268,7 +268,7 @@
         const field={F:'amount',G:'vat',H:'net'}[col];
         const cell=ws.getCell(`${col}${totalRow}`);cell.value={formula:`SUM(${col}${first}:${col}${last})`,result:state.entries.reduce((sum,e)=>sum+safeNum(e[field]),0)};
         cell.numFmt='#,##0.00;[Red](#,##0.00);-';cell.font={name:'Arial',size:11,bold:true,color:{argb:col==='F'?'FFC52F2F':'FF1F4D33'}};
-        cell.alignment={horizontal:'right',vertical:'middle',indent:1};
+        cell.alignment={horizontal:'right',vertical:'middle',shrinkToFit:true};
       }
       ws.getRow(totalRow).height=23;
       // Signatures
