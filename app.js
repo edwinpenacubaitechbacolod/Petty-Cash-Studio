@@ -201,9 +201,9 @@
     try {
       const info=details();const wb=new window.ExcelJS.Workbook();wb.creator='Bacolod Warehouse Petty Cash Studio';wb.created=new Date();wb.calcProperties.fullCalcOnLoad=true;
       const sheetTitle=('REF#'+(info.reference||'NEW')).replace(/[\[\]:*?/\\]/g,'').slice(0,31);
-      const margins={left:0.4,right:0.4,top:0.5,bottom:0.7,header:0.3,footer:0.3};
+      const margins={left:0.22,right:0.22,top:0.3,bottom:0.4,header:0.12,footer:0.18};
       const ws=wb.addWorksheet(sheetTitle,{
-        pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,horizontalCentered:true,margins,printTitlesRow:'5:6'},
+        pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:1,horizontalCentered:true,margins,printTitlesRow:'5:6'},
         headerFooter:{oddFooter:FOOTER},
         views:[{state:'frozen',ySplit:6,showGridLines:false}]
       });
@@ -212,7 +212,7 @@
       for(let r=1;r<=2;r++)for(let c=1;c<=3;c++){const lc=ws.getCell(r,c);lc.value=null;lc.fill=solid(THEME.white);}
       ws.mergeCells('D1:J1');ws.getCell('D1').value='BACOLOD WAREHOUSE';
       ws.mergeCells('D2:J2');ws.getCell('D2').value='PETTY CASH LIQUIDATION';
-      ws.getRow(1).height=32;ws.getRow(2).height=28;
+      ws.getRow(1).height=26;ws.getRow(2).height=23;
       for(const [row,fontSize,fill] of [[1,18,THEME.dark],[2,12,THEME.mid]]){
         for(let c=4;c<=10;c++)ws.getCell(row,c).fill=solid(fill);
         const cell=ws.getCell(`D${row}`);
@@ -220,7 +220,7 @@
       }
       try{
         const logoId=wb.addImage({base64:LOGO_DATA_URL,extension:'png'});
-        ws.addImage(logoId,{tl:{col:0.1,row:0.2},ext:{width:230,height:60}});
+        ws.addImage(logoId,{tl:{col:0.1,row:0.2},ext:{width:175,height:48}});
       }catch(e){console.warn('Logo could not be added',e);}
       // Reference / period
       ws.mergeCells('A3:C3');ws.getCell('A3').value=`REF# : ${info.reference}`;
@@ -240,16 +240,17 @@
         cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};setCellBorder(cell,'2F7347');
       }
       // Data rows
+      // 13 transaction rows by default, starting directly below the row 5–6 headers.
       const count=Math.max(13,state.entries.length);const first=7;const last=first+count-1;const totalRow=last+1;
       state.entries.forEach((entry,i)=>{
-        const row=ws.getRow(first+i);row.height=29;
+        const row=ws.getRow(first+i);row.height=23;
         const fields=[dateForExcel(entry.date),compact(entry.payee).toUpperCase()||null,compact(entry.company).toUpperCase()||null,compact(entry.tin)||null,compact(entry.receipt)||null,number(entry.amount),number(entry.vat),number(entry.net),null,compact(entry.particulars).toUpperCase()||null];
         fields.forEach((v,j)=>{if(v!==null && v!==undefined)row.getCell(j+1).value=v;});
         row.getCell(1).numFmt='mm/dd/yyyy';
         for(const col of [6,7,8])row.getCell(col).numFmt='#,##0.00;[Red](#,##0.00);-';
       });
       for(let r=first;r<=last;r++){
-        const row=ws.getRow(r);if(!row.height)row.height=24;
+        const row=ws.getRow(r);if(!row.height)row.height=23;
         for(let c=1;c<=10;c++){
           const cell=row.getCell(c);cell.font={name:'Arial',size:9,color:{argb:'FF1F2D26'}};
           cell.alignment={vertical:'middle',horizontal:[6,7,8].includes(c)?'right':c===10?'left':'center',wrapText:true,indent:[6,7,8].includes(c)||c===10?1:0};
@@ -269,12 +270,12 @@
         cell.numFmt='#,##0.00;[Red](#,##0.00);-';cell.font={name:'Arial',size:11,bold:true,color:{argb:col==='F'?'FFC52F2F':'FF1F4D33'}};
         cell.alignment={horizontal:'right',vertical:'middle',indent:1};
       }
-      ws.getRow(totalRow).height=26;
+      ws.getRow(totalRow).height=23;
       // Signatures
       const prep=ws.getCell(`C${totalRow+2}`);
       prep.value=`PREPARED BY: ${info.preparedBy||''}`;prep.font={name:'Arial',size:10,bold:true,color:{argb:'FF1F4D33'}};
       const approvers=info.approvers.split(',').map(s=>s.trim()).filter(Boolean);
-      ws.getRow(totalRow+5).height=26;
+      ws.getRow(totalRow+5).height=20;
       const signBorder={top:{style:'thin',color:{argb:'FF222F30'}}};
       const names=[[`C${totalRow+6}`,approvers[0]||null,`C${totalRow+7}`,'SENIOR TEAM LEADER'],[`D${totalRow+6}`,approvers[1]||null,`D${totalRow+7}`,'AREA MANAGER']];
       for(const [nameCell,name,titleCell,title] of names){
